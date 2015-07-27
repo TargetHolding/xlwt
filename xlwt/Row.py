@@ -39,9 +39,9 @@ class Row(object):
                  "hidden",
                  "space_above",
                  "space_below",
-                 ]
+                 "respect_256_columns_limit"]
 
-    def __init__(self, rowx, parent_sheet):
+    def __init__(self, rowx, parent_sheet, respect_256_columns_limit=False):
         if not (isinstance(rowx, int_types) and 0 <= rowx <= 65535):
             raise XLWTRowNotInRangeException("row index was %r, not allowed by .xls format" % rowx)
         self.__idx = rowx
@@ -62,7 +62,7 @@ class Row(object):
         self.hidden = 0
         self.space_above = 0
         self.space_below = 0
-
+        self.respect_256_columns_limit = respect_256_columns_limit
 
     def __adjust_height(self, style):
         twips = style.font.height
@@ -77,8 +77,11 @@ class Row(object):
     def __adjust_bound_col_idx(self, *args):
         for arg in args:
             iarg = int(arg)
-            if not ((0 <= iarg <= 255) and arg == iarg):
-                raise XLWTColumnNotInRangeException("column index (%r) not an int in range(256)" % arg)
+            if self.respect_256_columns_limit:
+                # The XLS specifications allow for only 256 columns in a spreadsheet, however most applications can
+                # handle this just fine
+                if not ((0 <= iarg <= 255) and arg == iarg):
+                    raise XLWTColumnNotInRangeException("column index (%r) not an int in range(256)" % arg)
             sheet = self.__parent
             if iarg < self.__min_col_idx:
                 self.__min_col_idx = iarg
