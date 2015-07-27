@@ -7,6 +7,7 @@ import struct
 from . import Utils
 from .UnicodeUtils import upack1
 from .ExcelMagic import *
+from .Exceptions import XLWTFormulaException
 
 _RVAdelta =     {"R": 0, "V": 0x20, "A": 0x40}
 _RVAdeltaRef =  {"R": 0, "V": 0x20, "A": 0x40, "D": 0x20}
@@ -483,7 +484,7 @@ class Parser(antlr.LLkParser):
                 pass
                 name_tok = self.LT(1)
                 self.match(NAME)
-                raise Exception("[formula] found unexpected NAME token (%r)" % name_tok.txt)
+                raise XLWTFormulaException("[formula] found unexpected NAME token (%r)" % name_tok.txt)
                 # #### TODO: handle references to defined names here
             elif (self.LA(1)==NAME) and (self.LA(2)==LP):
                 pass
@@ -498,7 +499,7 @@ class Parser(antlr.LLkParser):
                    arg_type_str) = all_funcs_by_name[func_toku]
                    arg_type_list = list(arg_type_str)
                 else:
-                   raise Exception("[formula] unknown function (%s)" % func_tok.text)
+                   raise XLWTFormulaException("[formula] unknown function (%s)" % func_tok.text)
                 # print "**func_tok1 %s %s" % (func_toku, func_type)
                 xcall = opcode < 0
                 if xcall:
@@ -514,7 +515,7 @@ class Parser(antlr.LLkParser):
                 arg_count=self.expr_list(arg_type_list, min_argc, max_argc)
                 self.match(RP)
                 if arg_count > max_argc or arg_count < min_argc:
-                   raise Exception("%d parameters for function: %s" % (arg_count, func_tok.text))
+                   raise XLWTFormulaException("%d parameters for function: %s" % (arg_count, func_tok.text))
                 if xcall:
                    func_ptg = ptgFuncVarR + _RVAdelta[func_type]
                    self.rpn += struct.pack("<2BH", func_ptg, arg_count + 1, 255) # 255 is magic XCALL function

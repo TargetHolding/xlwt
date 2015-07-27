@@ -4,8 +4,9 @@ from __future__ import print_function
 from . import Formatting
 from .BIFFRecords import NumberFormatRecord, XFRecord, StyleRecord
 from .compat import basestring, xrange
-
+from .Exceptions import XLWTStyleException
 FIRST_USER_DEFINED_NUM_FORMAT_IDX = 164
+
 
 class XFStyle(object):
 
@@ -18,6 +19,7 @@ class XFStyle(object):
         self.protection      = Formatting.Protection()
 
 default_style = XFStyle()
+
 
 class StyleCollection(object):
     _std_num_fmt_list = [
@@ -178,7 +180,6 @@ class StyleCollection(object):
             
         return font_idx
 
-
     def get_biff_data(self):
         result = b''
         result += self._all_fonts()
@@ -228,14 +229,18 @@ class StyleCollection(object):
 
 # easyxf and its supporting objects ###################################
 
+
 class EasyXFException(Exception):
     pass
+
 
 class EasyXFCallerError(EasyXFException):
     pass
 
+
 class EasyXFAuthorError(EasyXFException):
     pass
+
 
 class IntULim(object):
     # If astring represents a valid unsigned integer ('123', '0xabcd', etc)
@@ -373,9 +378,10 @@ for _line in _colour_map_text.splitlines():
         colour_map[_name.replace('gray', 'grey')] = _num
 del _colour_map_text, _line, _name, _num
 
+
 def add_palette_colour(colour_str, colour_index):
     if not (8 <= colour_index <= 63):
-        raise Exception("add_palette_colour: colour_index (%d) not in range(8, 64)" % 
+        raise XLWTStyleException("add_palette_colour: colour_index (%d) not in range(8, 64)" %
                 (colour_index))
     colour_map[colour_str] = colour_index
 
@@ -485,8 +491,10 @@ pattern_map = {
     'diamonds':             16,
     }
 
+
 def any_str_func(s):
     return s.strip()
+
 
 def colour_index_func(s, maxval=0x7F):
     try:
@@ -499,8 +507,10 @@ def colour_index_func(s, maxval=0x7F):
 
 colour_index_func_7 = colour_index_func
 
+
 def colour_index_func_15(s):
     return colour_index_func(s, maxval=0x7FFF)
+
 
 def rotation_func(s):
     try:
@@ -608,6 +618,7 @@ xf_dict = {
         },
     }
 
+
 def _esplit(s, split_char, esc_char="\\"):
     escaped = False
     olist = ['']
@@ -622,6 +633,7 @@ def _esplit(s, split_char, esc_char="\\"):
         else:
             olist[-1] += c
     return olist
+
 
 def _parse_strg_to_obj(strg, obj, parse_dict,
     field_sep=",", line_sep=";", intro_sep=":", esc_char="\\", debug=False):
@@ -696,6 +708,7 @@ def _parse_strg_to_obj(strg, obj, parse_dict,
             if debug: print("+++ %s.%s = %r # %s; was %r" % (section, k, value, v, orig))
             setattr(section_obj, k, value)
 
+
 def easyxf(strg_to_parse="", num_format_str=None,
            field_sep=",", line_sep=";", intro_sep=":", esc_char="\\", debug=False):
     """
@@ -734,6 +747,7 @@ def easyxf(strg_to_parse="", num_format_str=None,
         _parse_strg_to_obj(strg_to_parse, xfobj, xf_dict,
             field_sep=field_sep, line_sep=line_sep, intro_sep=intro_sep, esc_char=esc_char, debug=debug)
     return xfobj
+
 
 def easyfont(strg_to_parse="", field_sep=",", esc_char="\\", debug=False):
     xfobj = XFStyle()

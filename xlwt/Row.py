@@ -8,6 +8,8 @@ from . import ExcelFormula
 import datetime as dt
 from .Formatting import Font
 from .compat import basestring, xrange, int_types, iteritems
+from .Exceptions import XLWTRowNotInRangeException, XLWTColumnNotInRangeException, XLWTUnexpectedDataTypeException, \
+    XLWTCellException
 
 try:
     from decimal import Decimal
@@ -36,11 +38,12 @@ class Row(object):
                  "collapse",
                  "hidden",
                  "space_above",
-                 "space_below"]
+                 "space_below",
+                 ]
 
     def __init__(self, rowx, parent_sheet):
         if not (isinstance(rowx, int_types) and 0 <= rowx <= 65535):
-            raise ValueError("row index was %r, not allowed by .xls format" % rowx)
+            raise XLWTRowNotInRangeException("row index was %r, not allowed by .xls format" % rowx)
         self.__idx = rowx
         self.__parent = parent_sheet
         self.__parent_wb = parent_sheet.get_parent()
@@ -64,19 +67,18 @@ class Row(object):
     def __adjust_height(self, style):
         twips = style.font.height
         points = float(twips)/20.0
-        # Cell height in pixels can be calcuted by following approx. formula:
+        # Cell height in pixels can be calculated by following approx. formula:
         # cell height in pixels = font height in points * 83/50 + 2/5
         # It works when screen resolution is 96 dpi
         pix = int(round(points*83.0/50.0 + 2.0/5.0))
         if pix > self.__height_in_pixels:
             self.__height_in_pixels = pix
 
-
     def __adjust_bound_col_idx(self, *args):
         for arg in args:
             iarg = int(arg)
             if not ((0 <= iarg <= 255) and arg == iarg):
-                raise ValueError("column index (%r) not an int in range(256)" % arg)
+                raise XLWTColumnNotInRangeException("column index (%r) not an int in range(256)" % arg)
             sheet = self.__parent
             if iarg < self.__min_col_idx:
                 self.__min_col_idx = iarg
@@ -112,28 +114,22 @@ class Row(object):
     def get_height_in_pixels(self):
         return self.__height_in_pixels
 
-
     def set_style(self, style):
         self.__adjust_height(style)
         self.__xf_index = self.__parent_wb.add_style(style)
         self.__has_default_xf_index = 1
 
-
     def get_xf_index(self):
         return self.__xf_index
-
 
     def get_cells_count(self):
         return len(self.__cells)
 
-
     def get_min_col(self):
         return self.__min_col_idx
 
-
     def get_max_col(self):
         return self.__max_col_idx
-
 
     def get_row_biff_data(self):
         height_options = (self.height & 0x07FFF)
@@ -157,7 +153,7 @@ class Row(object):
             if not self.__parent._cell_overwrite_ok:
                 msg = "Attempt to overwrite cell: sheetname=%r rowx=%d colx=%d" \
                     % (self.__parent.name, self.__idx, col_index)
-                raise Exception(msg)
+                raise XLWTCellException(msg)
             prev_cell_obj = self.__cells[col_index]
             sst_idx = getattr(prev_cell_obj, 'sst_idx', None)
             if sst_idx is not None:
@@ -257,13 +253,13 @@ class Row(object):
         elif isinstance(label, (list, tuple)):
             self.__rich_text_helper(col, label, style, style_index)
         else:
-            raise Exception("Unexpected data type %r" % type(label))
+            raise XLWTUnexpectedDataTypeException("Unexpected data type %r" % type(label))
 
     def set_cell_rich_text(self, col, rich_text_list, style=Style.default_style):
         self.__adjust_height(style)
         self.__adjust_bound_col_idx(col)
         if not isinstance(rich_text_list, (list, tuple)):
-            raise Exception("Unexpected data type %r" % type(rich_text_list))
+            raise XLWTUnexpectedDataTypeException("Unexpected data type %r" % type(rich_text_list))
         self.__rich_text_helper(col, rich_text_list, style)
 
     def __rich_text_helper(self, col, rich_text_list, style, style_index=None):
@@ -277,11 +273,11 @@ class Row(object):
                 font = default_font
             elif isinstance(data, (list, tuple)):
                 if not isinstance(data[0], basestring) or not isinstance(data[1], Font):
-                    raise Exception ("Unexpected data type %r, %r" % (type(data[0]), type(data[1])))
+                    raise XLWTUnexpectedDataTypeException ("Unexpected data type %r, %r" % (type(data[0]), type(data[1])))
                 s = data[0]
                 font = self.__parent_wb.add_font(data[1])
             else:
-                raise Exception ("Unexpected data type %r" % type(data))
+                raise XLWTUnexpectedDataTypeException ("Unexpected data type %r" % type(data))
             if s:
                 rt.append((s, font))
                 if default_font is None:

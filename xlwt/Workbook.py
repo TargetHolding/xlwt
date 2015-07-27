@@ -41,6 +41,8 @@
 from . import BIFFRecords
 from . import Style
 from .compat import unicode_type
+from .Exceptions import XLWTStyleException, XLWTWorkBookException, XLWTSheetException
+
 
 class Workbook(object):
     """
@@ -304,10 +306,10 @@ class Workbook(object):
 
     def set_colour_RGB(self, colour_index, red, green, blue):
         if not(8 <= colour_index <= 63):
-            raise Exception("set_colour_RGB: colour_index (%d) not in range(8, 64)" % 
+            raise XLWTStyleException("set_colour_RGB: colour_index (%d) not in range(8, 64)" %
                     colour_index)
         if min(red, green, blue) < 0 or max(red, green, blue) > 255:
-            raise Exception("set_colour_RGB: colour values (%d,%d,%d) must be in range(0, 256)" 
+            raise XLWTStyleException("set_colour_RGB: colour values (%d,%d,%d) must be in range(0, 256)"
                     % (red, green, blue))
         if self.__custom_palette_b8 is None: 
             self.__custom_palette_b8 = list(Style.excel_default_palette_b8)
@@ -365,10 +367,10 @@ class Workbook(object):
         if not isinstance(sheetname, unicode_type):
             sheetname = sheetname.decode(self.encoding)
         if not Utils.valid_sheet_name(sheetname):
-            raise Exception("invalid worksheet name %r" % sheetname)
+            raise XLWTWorkBookException("invalid worksheet name %r" % sheetname)
         lower_name = sheetname.lower()
         if lower_name in self.__worksheet_idx_from_name:
-            raise Exception("duplicate worksheet name %r" % sheetname)
+            raise XLWTWorkBookException("duplicate worksheet name %r" % sheetname)
         self.__worksheet_idx_from_name[lower_name] = len(self.__worksheets)
         self.__worksheets.append(Worksheet(sheetname, self, cell_overwrite_ok))
         return self.__worksheets[-1]
@@ -377,14 +379,14 @@ class Workbook(object):
         return self.__worksheets[sheetnum]
 
     def raise_bad_sheetname(self, sheetname):
-        raise Exception("Formula: unknown sheet name %s" % sheetname)
+        raise XLWTSheetException("Formula: unknown sheet name %s" % sheetname)
 
     def convert_sheetindex(self, strg_ref, n_sheets):
         idx = int(strg_ref)
         if 0 <= idx < n_sheets:
             return idx
         msg = "Formula: sheet index (%s) >= number of sheets (%d)" % (strg_ref, n_sheets)
-        raise Exception(msg)
+        raise XLWTSheetException(msg)
 
     def _get_supbook_index(self, tag):
         if tag in self._supbook_xref:
@@ -433,7 +435,7 @@ class Workbook(object):
             if ref1n < ref0n:
                 msg = "Formula: sheets out of order; %r:%r -> (%d, %d)" \
                     % (ref0, ref1, ref0n, ref1n)
-                raise Exception(msg)
+                raise XLWTSheetException(msg)
             if self._ownbook_supbookx is None:
                 self.setup_ownbook()
             reference = (self._ownbook_supbookx, ref0n, ref1n)
@@ -442,7 +444,7 @@ class Workbook(object):
             else:
                 nrefs = len(self.__sheet_refs)
                 if nrefs > 65535:
-                    raise Exception('More than 65536 inter-sheet references')
+                    raise XLWTSheetException('More than 65536 inter-sheet references')
                 self.__sheet_refs[reference] = nrefs
                 patches.append((offset, nrefs))
 
@@ -694,5 +696,3 @@ class Workbook(object):
 
         doc = CompoundDoc.XlsDoc()
         doc.save(filename_or_stream, self.get_biff_data())
-
-

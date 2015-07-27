@@ -41,6 +41,8 @@ var.     ln or
 
 from .compat import unicode, unicode_type
 from struct import pack
+from .Exceptions import XLWTFStringLengthException
+
 
 def upack2(s, encoding='ascii'):
     # If not unicode, make it so.
@@ -52,7 +54,7 @@ def upack2(s, encoding='ascii'):
     # (not on number of bytes in packed result)
     len_us = len(us)
     if len_us > 32767:
-        raise Exception('String longer than 32767 characters')
+        raise XLWTFStringLengthException('String longer than 32767 characters')
     try:
         encs = us.encode('latin1')
         # Success here means all chars are in U+0000 to U+00FF
@@ -69,6 +71,7 @@ def upack2(s, encoding='ascii'):
         # and 2 on a narrow-unicode build.
         # We need n_items == 2 in this case.
     return pack('<HB', n_items, flag) + encs
+
 
 def upack2rt(rt, encoding='ascii'):
     us = u''
@@ -89,7 +92,7 @@ def upack2rt(rt, encoding='ascii'):
         offset += len(s.encode('utf_16_le')) // 2
     num_fr = len(fr) // 4 # ensure result is int
     if offset > 32767:
-        raise Exception('String longer than 32767 characters')
+        raise XLWTFStringLengthException('String longer than 32767 characters')
     try:
         encs = us.encode('latin1')
         # Success here means all chars are in U+0000 to U+00FF
@@ -102,6 +105,7 @@ def upack2rt(rt, encoding='ascii'):
         n_items = len(encs) // 2 # see comments in upack2 function above
     return pack('<HBH', n_items, flag, num_fr) + encs, fr
 
+
 def upack1(s, encoding='ascii'):
     # Same as upack2(), but with a one-byte length field.
     if isinstance(s, unicode_type):
@@ -110,7 +114,7 @@ def upack1(s, encoding='ascii'):
         us = unicode(s, encoding)
     len_us = len(us)
     if len_us > 255:
-        raise Exception('String longer than 255 characters')
+        raise XLWTFStringLengthException('String longer than 255 characters')
     try:
         encs = us.encode('latin1')
         flag = 0

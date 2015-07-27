@@ -3,6 +3,8 @@
 from struct import unpack, pack
 from . import BIFFRecords
 from .compat import xrange
+from .Exceptions import XLWTCellException
+
 
 class StrCell(object):
     __slots__ = ["rowx", "colx", "xf_idx", "sst_idx"]
@@ -17,6 +19,7 @@ class StrCell(object):
         # return BIFFRecords.LabelSSTRecord(self.rowx, self.colx, self.xf_idx, self.sst_idx).get()
         return pack('<5HL', 0x00FD, 10, self.rowx, self.colx, self.xf_idx, self.sst_idx)
 
+
 class BlankCell(object):
     __slots__ = ["rowx", "colx", "xf_idx"]
 
@@ -28,6 +31,7 @@ class BlankCell(object):
     def get_biff_data(self):
         # return BIFFRecords.BlankRecord(self.rowx, self.colx, self.xf_idx).get()
         return pack('<5H', 0x0201, 6, self.rowx, self.colx, self.xf_idx)
+
 
 class MulBlankCell(object):
     __slots__ = ["rowx", "colx1", "colx2", "xf_idx"]
@@ -41,6 +45,7 @@ class MulBlankCell(object):
     def get_biff_data(self):
         return BIFFRecords.MulBlankRecord(self.rowx,
             self.colx1, self.colx2, self.xf_idx).get()
+
 
 class NumberCell(object):
     __slots__ = ["rowx", "colx", "xf_idx", "number"]
@@ -107,6 +112,7 @@ class NumberCell(object):
             return pack('<5Hi', 0x27E, 10, self.rowx, self.colx, self.xf_idx, value)
         return value # NUMBER record already packed
 
+
 class BooleanCell(object):
     __slots__ = ["rowx", "colx", "xf_idx", "number"]
 
@@ -137,6 +143,7 @@ error_code_map = {
     '#N/A!'  : 42, # Argument or function not available
 }
 
+
 class ErrorCell(object):
     __slots__ = ["rowx", "colx", "xf_idx", "number"]
 
@@ -147,11 +154,12 @@ class ErrorCell(object):
         try:
             self.number = error_code_map[error_string_or_code]
         except KeyError:
-            raise Exception('Illegal error value (%r)' % error_string_or_code)
+            raise XLWTCellException('Illegal error value (%r)' % error_string_or_code)
 
     def get_biff_data(self):
         return BIFFRecords.BoolErrRecord(self.rowx,
             self.colx, self.xf_idx, self.number, 1).get()
+
 
 class FormulaCell(object):
     __slots__ = ["rowx", "colx", "xf_idx", "frmla", "calc_flags"]

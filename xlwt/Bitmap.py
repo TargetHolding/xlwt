@@ -6,6 +6,7 @@
 
 from .BIFFRecords import BiffRecord
 from struct import pack, unpack
+from .Exceptions import XLWTBitmapException
 
 
 def _size_col(sheet, col):
@@ -198,10 +199,10 @@ def _process_bitmap(bitmap):
 
     # Check that the file is big enough to be a bitmap.
     if len(data) <= 0x36:
-        raise Exception("bitmap doesn't contain enough data.")
+        raise XLWTBitmapException("bitmap doesn't contain enough data.")
     # The first 2 bytes are used to identify the bitmap.
     if (data[:2] != b"BM"):
-        raise Exception("bitmap doesn't appear to to be a valid bitmap image.")
+        raise XLWTBitmapException("bitmap doesn't appear to to be a valid bitmap image.")
     # Remove bitmap data: ID.
     data = data[2:]
     # Read and remove the bitmap size. This is more reliable than reading
@@ -217,21 +218,21 @@ def _process_bitmap(bitmap):
     width, height = unpack("<LL", data[:8])
     data = data[8:]
     if (width > 0xFFFF):
-        raise Exception("bitmap: largest image width supported is 65k.")
+        raise XLWTBitmapException("bitmap: largest image width supported is 65k.")
     if (height > 0xFFFF):
-        raise Exception("bitmap: largest image height supported is 65k.")
+        raise XLWTBitmapException("bitmap: largest image height supported is 65k.")
     # Read and remove the bitmap planes and bpp data. Verify them.
     planes, bitcount = unpack("<HH", data[:4])
     data = data[4:]
     if (bitcount != 24):
-        raise Exception("bitmap isn't a 24bit true color bitmap.")
+        raise XLWTBitmapException("bitmap isn't a 24bit true color bitmap.")
     if (planes != 1):
-        raise Exception("bitmap: only 1 plane supported in bitmap image.")
+        raise XLWTBitmapException("bitmap: only 1 plane supported in bitmap image.")
     # Read and remove the bitmap compression. Verify compression.
     compression = unpack("<L", data[:4])[0]
     data = data[4:]
     if (compression != 0):
-        raise Exception("bitmap: compression not supported in bitmap image.")
+        raise XLWTBitmapException("bitmap: compression not supported in bitmap image.")
     # Remove bitmap data: data size, hres, vres, colours, imp. colours.
     data = data[20:]
     # Add the BITMAPCOREHEADER data

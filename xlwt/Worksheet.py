@@ -38,7 +38,9 @@ from . import Style
 from .Row import Row
 from .Column import Column
 from .compat import unicode, itervalues
+from .Exceptions import XLWTRowOverwriteException
 import tempfile
+
 
 class Worksheet(object):
     """
@@ -1132,7 +1134,7 @@ class Worksheet(object):
     def row(self, indx):
         if indx not in self.__rows:
             if indx in self.__flushed_rows:
-                raise Exception("Attempt to reuse row index %d of sheet %r after flushing" % (indx, self.__name))
+                raise XLWTRowOverwriteException("Attempt to reuse row index %d of sheet %r after flushing" % (indx, self.__name))
             self.__rows[indx] = self.Row(indx, self)
             if indx > self.last_used_row:
                 self.last_used_row = indx

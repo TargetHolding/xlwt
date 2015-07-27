@@ -5,6 +5,7 @@
 import re
 from .ExcelMagic import MAX_ROW, MAX_COL
 from .compat import xrange
+from .Exceptions import XLWTCellException, XLWTFColumnException, XLWTRowException
 
 _re_cell_ex = re.compile(r"(\$?)([A-I]?[A-Z])(\$?)(\d+)", re.IGNORECASE)
 _re_row_range = re.compile(r"\$?(\d+):\$?(\d+)")
@@ -34,7 +35,7 @@ def cell_to_rowcol(cell):
     """
     m = _re_cell_ex.match(cell)
     if not m:
-        raise Exception("Ill-formed single_cell reference: %s" % cell)
+        raise XLWTCellException("Ill-formed single_cell reference: %s" % cell)
     col_abs, col, row_abs, row = m.groups()
     row_abs = bool(row_abs)
     col_abs = bool(col_abs)
@@ -52,7 +53,7 @@ def cell_to_rowcol2(cell):
     """
     m = _re_cell_ex.match(cell)
     if not m:
-        raise Exception("Error in cell format")
+        raise XLWTCellException("Error in cell format")
     col_abs, col, row_abs, row = m.groups()
     # Convert base26 column string to number
     # All your Base are belong to us.
@@ -136,16 +137,16 @@ def cellrange_to_rowcol_pair(cellrange):
     if res:
         row1, col1 = cell_to_rowcol2(res.group(1))
         return row1, col1, row1, col1
-    raise Exception("Unknown cell reference %s" % (cellrange))
+    raise XLWTCellException("Unknown cell reference %s" % (cellrange))
 
 
 def cell_to_packed_rowcol(cell):
     """ pack row and column into the required 4 byte format """
     row, col, row_abs, col_abs = cell_to_rowcol(cell)
     if col >= MAX_COL:
-        raise Exception("Column %s greater than IV in formula" % cell)
+        raise XLWTFColumnException("Column %s greater than IV in formula" % cell)
     if row >= MAX_ROW: # this for BIFF8. for BIFF7 available 2^14
-        raise Exception("Row %s greater than %d in formula" % (cell, MAX_ROW))
+        raise XLWTRowException("Row %s greater than %d in formula" % (cell, MAX_ROW))
     col |= int(not row_abs) << 15
     col |= int(not col_abs) << 14
     return row, col
