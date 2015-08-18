@@ -194,7 +194,7 @@ class StyleCollection(object):
             alist = self._font_x2id.items()
         else:
             alist = [(x, o) for o, x in self._font_id2x.items()]
-        alist.sort()
+        alist = sorted(alist)
         for font_idx, font in alist:
             result += font.get_biff_record().get()
         return result
@@ -206,7 +206,7 @@ class StyleCollection(object):
             for k, v in self._num_formats.items()
             if v >= FIRST_USER_DEFINED_NUM_FORMAT_IDX
             ]
-        alist.sort()
+        alist = sorted(alist)
         for fmtidx, fmtstr in alist:
             result += NumberFormatRecord(fmtidx, fmtstr).get()
         return result
@@ -219,7 +219,7 @@ class StyleCollection(object):
             alist = self._xf_x2id.items()
         else:
             alist = [(x, o) for o, x in self._xf_id2x.items()]
-        alist.sort()
+        alist = sorted(alist)
         for xf_idx, xf in alist:
             result += XFRecord(xf).get()
         return result
@@ -755,3 +755,4 @@ def easyfont(strg_to_parse="", field_sep=",", esc_char="\\", debug=False):
         _parse_strg_to_obj("font: " + strg_to_parse, xfobj, xf_dict,
             field_sep=field_sep, line_sep=";", intro_sep=":", esc_char=esc_char, debug=debug)
     return xfobj.font
+
