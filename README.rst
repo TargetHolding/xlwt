@@ -1,13 +1,16 @@
-|Travis|_ |Coveralls|_ |Docs|_
+|Travis|_ |Coveralls|_ |Docs|_ |PyPI|_
 
-.. |Travis| image:: https://api.travis-ci.org/python-excel/xlwt.png?branch=master
+.. |Travis| image:: https://api.travis-ci.org/python-excel/xlwt.svg?branch=master
 .. _Travis: https://travis-ci.org/python-excel/xlwt
 
-.. |Coveralls| image:: https://coveralls.io/repos/python-excel/xlwt/badge.png?branch=master
+.. |Coveralls| image:: https://coveralls.io/repos/python-excel/xlwt/badge.svg?branch=master
 .. _Coveralls: https://coveralls.io/r/python-excel/xlwt?branch=master
 
 .. |Docs| image:: https://readthedocs.org/projects/xlwt/badge/?version=latest
-.. _Docs: http://xlwt.readthedocs.org/en/latest/
+.. _Docs: https://xlwt.readthedocs.org/en/latest/
+
+.. |PyPI| image:: https://badge.fury.io/py/xlwt.svg
+.. _PyPI: https://badge.fury.io/py/xlwt
 
 xlwt
 ====
@@ -17,6 +20,9 @@ spreadsheet files compatible with Microsoft Excel versions 95 to 2003.
 
 The package itself is pure Python with no dependencies on modules or packages
 outside the standard Python distribution.
+
+Please read this before using this package:
+https://groups.google.com/d/msg/python-excel/P6TjJgFVjMI/g8d0eWxTBQAJ
 
 Installation
 ============
@@ -28,7 +34,7 @@ Do the following in your virtualenv::
 Quick start
 ===========
 
-::
+.. code-block:: python
 
     import xlwt
     from datetime import datetime
@@ -57,7 +63,7 @@ If these aren't sufficient, please consult the code in the
 examples directory and the source code itself.
 
 The latest documentation can also be found at:
-http://xlwt.readthedocs.org/en/latest/
+https://xlwt.readthedocs.org/en/latest/
 
 Problems?
 =========
@@ -65,7 +71,7 @@ Try the following in this order:
 
 - Read the source
 
-- Ask a question on http://groups.google.com/group/python-excel/
+- Ask a question on https://groups.google.com/group/python-excel/
 
 Acknowledgements
 ================

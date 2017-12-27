@@ -3,6 +3,61 @@ Changes
 
 .. currentmodule:: xlwt
 
+1.3.0 (22 August 2017)
+----------------------
+
+- Officially support Python 3.6, drop support for 2.6.
+
+- Fix bytes/string type mismatch in :func:`upack2rt` on python 3.
+
+- Packaging and code style tweaks.
+
+- Use generator expressions to avoid unnecessary lists in memory.
+
+Thanks to the following for their contributions to this release:
+
+- Jon Dufresne
+- Bill Adams
+
+1.2.0 (4 January 2017)
+----------------------
+
+- Remove ``LOCALE`` from regular expression that caused
+  :class:`DeprecationWarning` that become an exception in Python 3.6
+
+- Add :meth:`Workbook.sheet_index` helper.
+
+- :meth:`Workbook.get_sheet` now takes either a string name or an integer
+  index.
+
+1.1.2 (9 June 2016)
+-------------------
+
+- Fix failure in style compression under Python 3.
+
+- Officially support Python 3.5
+
+- Documentation tweaks.
+
+1.1.1 (2 June 2016)
+-------------------
+
+- Fix release problems.
+
+1.1.0 (2 June 2016)
+-------------------
+
+- Fix SST BIFF record in Python 3.
+
+- Fix for writing :class:`ExternSheetRecord` in Python 3.
+
+- Add the ability to insert bitmap images from buffers as well as files.
+
+- Official support for Python 3.5.
+
+Thanks to "thektulu" and Lele Gaifax for the Python 3 fixes.
+Thanks to Ross Golder for the support for inserting images from buffers.
+
 1.0.0 (15 April 2015)
 ---------------------
 

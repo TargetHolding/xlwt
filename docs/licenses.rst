@@ -108,11 +108,10 @@ Portions of xlwt.Utils are based on pyXLWriter which is licensed as follows::
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
  General Public License for more details:
 
- http://www.gnu.org/licenses/lgpl.html
+ https://www.gnu.org/licenses/lgpl.html
 
 pyXLWriter also makes reference to the PERL Spreadsheet::WriteExcel as follows::
- 
+
   This module was written/ported from PERL Spreadsheet::WriteExcel module
   The author of the PERL Spreadsheet::WriteExcel module is John McNamara
   <jmcnamara@cpan.org>
-

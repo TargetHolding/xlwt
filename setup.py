@@ -5,7 +5,7 @@ from xlwt import __VERSION__
 DESCRIPTION = (
     'Library to create spreadsheet files compatible with '
     'MS Excel 97/2000/XP/2003 XLS files, '
-    'on any platform, with Python 2.6, 2.6, 3.3+'
+    'on any platform, with Python 2.7, 3.3+'
     )
 
 CLASSIFIERS = [
@@ -19,11 +19,12 @@ CLASSIFIERS = [
     'Topic :: Database',
     'Topic :: Internet :: WWW/HTTP :: Dynamic Content :: CGI Tools/Libraries',
     'Programming Language :: Python :: 2',
-    'Programming Language :: Python :: 2.6',
     'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3',
     'Programming Language :: Python :: 3.3',
     'Programming Language :: Python :: 3.4',
+    'Programming Language :: Python :: 3.5',
+    'Programming Language :: Python :: 3.6',
     ]
 
 KEYWORDS = (
@@ -36,7 +37,7 @@ setup(
     maintainer='John Machin',
     maintainer_email='sjmachin@lexicon.net',
     url='http://www.python-excel.org/',
-    download_url='http://pypi.python.org/pypi/xlwt',
+    download_url='https://pypi.python.org/pypi/xlwt',
     description=DESCRIPTION,
     long_description=open(os.path.join(
         os.path.dirname(__file__), 'README.rst')

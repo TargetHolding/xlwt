@@ -54,7 +54,7 @@ class Worksheet(object):
     """
     # a safe default value, 3 is always valid!
     active_pane = 3
-    
+
     #################################################################
     ## Constructor
     #################################################################
@@ -1126,6 +1126,12 @@ class Worksheet(object):
 
         self.__bmp_rec += obj.get() + bmp.get()
 
+    def insert_bitmap_data(self, data, row, col, x = 0, y = 0, scale_x = 1, scale_y = 1):
+        bmp = Bitmap.ImRawDataBmpRecord(data)
+        obj = Bitmap.ObjBmpRecord(row, col, self, bmp, x, y, scale_x, scale_y)
+
+        self.__bmp_rec += obj.get() + bmp.get()
+
     def col(self, indx):
         if indx not in self.__cols:
             self.__cols[indx] = self.Column(indx, self)
@@ -1164,14 +1170,14 @@ class Worksheet(object):
 
     def __update_row_visible_levels(self):
         if self.__rows:
-            temp = max([self.__rows[r].level for r in self.__rows]) + 1
+            temp = max(self.__rows[r].level for r in self.__rows) + 1
             self.__row_visible_levels = max(temp, self.__row_visible_levels)
 
     def __guts_rec(self):
         self.__update_row_visible_levels()
         col_visible_levels = 0
         if len(self.__cols) != 0:
-            col_visible_levels = max([self.__cols[c].level for c in self.__cols]) + 1
+            col_visible_levels = max(self.__cols[c].level for c in self.__cols) + 1
         return BIFFRecords.GutsRecord(
             self.__row_gut_width, self.__col_gut_height, self.__row_visible_levels, col_visible_levels).get()
 
@@ -1393,7 +1399,7 @@ class Worksheet(object):
             # Above seek() is necessary to avoid a spurious IOError
             # with Errno 0 if the caller continues on writing rows
             # and flushing row data after the save().
-            # See http://bugs.python.org/issue3207
+            # See https://bugs.python.org/issue3207
         result.extend([
             self.__row_blocks_rec(),
             self.__merged_rec(),
@@ -1412,5 +1418,3 @@ class Worksheet(object):
             self.__flushed_rows[rowx] = 1
         self.__update_row_visible_levels()
         self.__rows = {}
-
-
